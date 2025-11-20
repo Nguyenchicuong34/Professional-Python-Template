@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VietBank - Xác nhận thanh toán</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.05)"><polygon points="0,0 0,100 1000,0"/></svg>') repeat-x;
+        }
+
+        .bank-logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bank-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .security-bar {
+            background: #27ae60;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .security-icon {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .transaction-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .status-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .transaction-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .transaction-subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        .transaction-details {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 18px;
+            color: #e74c3c;
+        }
+
+        .detail-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .merchant-info {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .merchant-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .merchant-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .merchant-details h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .merchant-details p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .security-info {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .security-shield {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #34495e;
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdb;
+        }
+
+        .footer-info {
+            background: #34495e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .timer {
+            background: #e74c3c;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.7; }
+        }
+
+        .otp-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .otp-input {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .otp-digit {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .otp-digit:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="bank-logo">🏦 VietBank</div>
+            <div class="bank-subtitle">Internet Banking - Thanh toán an toàn</div>
+        </div>
+
+        <div class="security-bar">
+            <div class="security-icon">🔒</div>
+            Kết nối được bảo mật bằng SSL 256-bit
+        </div>
+
+        <div class="timer">
+            ⏰ Thời gian còn lại: <span id="countdown">14:52</span>
+        </div>
+
+        <div class="main-content">
+            <div class="transaction-header">
+                <div class="status-icon">✓</div>
+                <h2 class="transaction-title">Xác nhận thanh toán</h2>
+                <p class="transaction-subtitle">Vui lòng kiểm tra thông tin giao dịch</p>
+            </div>
+
+            <div class="merchant-info">
+                <div class="merchant-header">
+                    <div class="merchant-logo">ST</div>
+                    <div class="merchant-details">
+                        <h3>Shopee Việt Nam</h3>
+                        <p>Mã đơn hàng: #SP240811001</p>
+                        <p>🌐 shopee.vn</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="transaction-details">
+                <div class="detail-row">
+                    <span class="detail-label">Ngày giao dịch:</span>
+                    <span class="detail-value">11/08/2025 - 15:23</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Mã giao dịch:</span>
+                    <span class="detail-value">VB240811152301</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Tài khoản nguồn:</span>
+                    <span class="detail-value">**** **** **** 1234</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Tài khoản đích:</span>
+                    <span class="detail-value">Shopee Vietnam Co., Ltd</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Nội dung:</span>
+                    <span class="detail-value">Thanh toán đơn hàng #SP240811001</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Phí giao dịch:</span>
+                    <span class="detail-value">0 VNĐ</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Số tiền:</span>
+                    <span class="detail-value">1.250.000 VNĐ</span>
+                </div>
+            </div>
+
+            <div class="otp-section">
+                <h4>🔐 Xác thực OTP</h4>
+                <p>Nhập mã OTP được gửi đến số điện thoại đã đăng ký *******789</p>
+                <div class="otp-input">
+                    <input type="text" maxlength="1" class="otp-digit">
+                    <input type="text" maxlength="1" class="otp-digit">
+                    <input type="text" maxlength="1" class="otp-digit">
+                    <input type="text" maxlength="1" class="otp-digit">
+                    <input type="text" maxlength="1" class="otp-digit">
+                    <input type="text" maxlength="1" class="otp-digit">
+                </div>
+                <p style="font-size: 12px; color: #666; text-align: center;">
+                    Chưa nhận được mã? <a href="#" style="color: #3498db;">Gửi lại</a>
+                </p>
+            </div>
+
+            <div class="security-info">
+                <div class="security-shield">🛡️</div>
+                <div>
+                    <strong>Bảo mật cao:</strong> Giao dịch được mã hóa end-to-end và tuân thủ tiêu chuẩn PCI DSS
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="cancelTransaction()">❌ Hủy giao dịch</button>
+                <button class="btn btn-primary" onclick="confirmTransaction()">✅ Xác nhận thanh toán</button>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <p>© 2025 VietBank. Mọi quyền được bảo lưu.</p>
+            <p>Hotline: 1900 1234 | Email: support@vietbank.com.vn</p>
+            <p>Giấy phép hoạt động số 123/GP-NHNN do Ngân hàng Nhà nước Việt Nam cấp</p>
+        </div>
+    </div>
+
+    <script>
+        // Countdown timer
+        let timeLeft = 15 * 60; // 15 minutes
+        const countdownElement = document.getElementById('countdown');
+
+        function updateCountdown() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft > 0) {
+                timeLeft--;
+            } else {
+                alert('⏰ Phiên giao dịch đã hết hạn. Vui lòng thực hiện lại.');
+                window.close();
+            }
+        }
+
+        setInterval(updateCountdown, 1000);
+
+        // OTP input handling
+        const otpInputs = document.querySelectorAll('.otp-digit');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        // Transaction functions
+        function confirmTransaction() {
+            const otpValue = Array.from(otpInputs).map(input => input.value).join('');
+            if (otpValue.length !== 6) {
+                alert('⚠️ Vui lòng nhập đầy đủ mã OTP 6 số');
+                return;
+            }
+
+            // Simulate processing
+            const button = event.target;
+            button.innerHTML = '⏳ Đang xử lý...';
+            button.disabled = true;
+
+            setTimeout(() => {
+                alert('✅ Giao dịch thành công!\n\nMã giao dịch: VB240811152301\nSố tiền: 1.250.000 VNĐ\n\nCảm ơn bạn đã sử dụng dịch vụ VietBank!');
+                // In real implementation, redirect to success page
+                window.location.href = '#success';
+            }, 2000);
+        }
+
+        function cancelTransaction() {
+            if (confirm('❓ Bạn có chắc chắn muốn hủy giao dịch này không?')) {
+                alert('❌ Giao dịch đã được hủy.');
+                // In real implementation, redirect to merchant site
+                window.history.back();
+            }
+        }
+
+        // Security enhancements
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+            }
+        });
+
+        // Auto-fill demo OTP after 3 seconds
+        setTimeout(() => {
+            const demoOTP = '123456';
+            otpInputs.forEach((input, index) => {
+                input.value = demoOTP[index];
+            });
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechStore - Mua sắm trực tuyến</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cart-summary {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cart-summary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 24px;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        .products-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .product-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .product-info h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 10px 0;
+        }
+
+        .product-description {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .product-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            overflow: hidden;
+        }
+
+        .qty-btn {
+            background: #f8f9fa;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .qty-btn:hover {
+            background: #e9ecef;
+        }
+
+        .qty-input {
+            border: none;
+            padding: 8px;
+            width: 50px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .add-to-cart {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .add-to-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .add-to-cart:active {
+            transform: scale(0.98);
+        }
+
+        .cart-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            
+            position: -webkit-sticky;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: #e74c3c;
+            font-size: 14px;
+        }
+
+        .cart-item-qty {
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .remove-item {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .cart-total {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .total-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .total-amount {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(243, 156, 18, 0.3);
+        }
+
+        .checkout-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 40px 20px;
+        }
+
+        .empty-cart-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            background: #ecf0f1;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .category-btn.active,
+        .category-btn:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">🛒 TechStore</div>
+            <div class="cart-summary" onclick="toggleCart()">
+                <div class="cart-icon">
+                    🛍️
+                    <span class="cart-count" id="cart-count">0</span>
+                </div>
+                <div>
+                    <div style="font-weight: bold;">Giỏ hàng</div>
+                    <div style="font-size: 14px; color: #666;" id="cart-total-header">0 VNĐ</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="products-section">
+            <h2 class="section-title">🎯 Sản phẩm nổi bật</h2>
+            
+            <div class="category-filter">
+                <button class="category-btn active" onclick="filterCategory('all')">Tất cả</button>
+                <button class="category-btn" onclick="filterCategory('phone')">📱 Điện thoại</button>
+                <button class="category-btn" onclick="filterCategory('laptop')">💻 Laptop</button>
+                <button class="category-btn" onclick="filterCategory('accessory')">🎧 Phụ kiện</button>
+            </div>
+
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <div class="cart-panel">
+            <h3 class="section-title">🛍️ Giỏ hàng</h3>
+            <div id="cart-items">
+                <div class="empty-cart">
+                    <div class="empty-cart-icon">🛒</div>
+                    <p>Giỏ hàng trống</p>
+                    <p style="font-size: 14px; margin-top: 5px;">Hãy chọn sản phẩm yêu thích!</p>
+                </div>
+            </div>
+            
+            <div class="cart-total" id="cart-total-section" style="display: none;">
+                <div class="total-label">Tổng cộng</div>
+                <div class="total-amount" id="total-amount">0 VNĐ</div>
+            </div>
+            
+            <button class="checkout-btn" id="checkout-btn" disabled onclick="checkout()">
+                💳 Thanh toán
+            </button>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Product data
+        const products = [
+            {
+                id: 1,
+                name: "iPhone 15 Pro Max",
+                price: 32990000,
+                category: "phone",
+                icon: "📱",
+                description: "Smartphone cao cấp với chip A17 Pro, camera 48MP và màn hình 6.7 inch"
+            },
+            {
+                id: 2,
+                name: "MacBook Air M2",
+                price: 28990000,
+                category: "laptop",
+                icon: "💻",
+                description: "Laptop mỏng nhẹ với chip M2, 8GB RAM và SSD 256GB"
+            },
+            {
+                id: 3,
+                name: "AirPods Pro 2",
+                price: 6990000,
+                category: "accessory",
+                icon: "🎧",
+                description: "Tai nghe không dây với chống ồn chủ động và âm thanh spatial"
+            },
+            {
+                id: 4,
+                name: "iPad Air",
+                price: 16990000,
+                category: "phone",
+                icon: "📱",
+                description: "Máy tính bảng với chip M1, màn hình 10.9 inch và hỗ trợ Apple Pencil"
+            },
+            {
+                id: 5,
+                name: "Dell XPS 13",
+                price: 25990000,
+                category: "laptop",
+                icon: "💻",
+                description: "Ultrabook cao cấp với Intel Core i7, 16GB RAM và màn hình 4K"
+            },
+            {
+                id: 6,
+                name: "Sony WH-1000XM5",
+                price: 8990000,
+                category: "accessory",
+                icon: "🎧",
+                description: "Tai nghe over-ear với chống ồn tốt nhất thế giới"
+            },
+            {
+                id: 7,
+                name: "Samsung Galaxy S24",
+                price: 22990000,
+                category: "phone",
+                icon: "📱",
+                description: "Smartphone Android cao cấp với camera 200MP và AI tích hợp"
+            },
+            {
+                id: 8,
+                name: "Apple Watch Ultra 2",
+                price: 19990000,
+                category: "accessory",
+                icon: "⌚",
+                description: "Đồng hồ thông minh dành cho thể thao extreme với pin 36 giờ"
+            }
+        ];
+
+        let cart = [];
+        let currentCategory = 'all';
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN').format(amount) + ' VNĐ';
+        }
+
+        // Render products
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            const filteredProducts = currentCategory === 'all' 
+                ? products 
+                : products.filter(p => p.category === currentCategory);
+
+            grid.innerHTML = filteredProducts.map(product => `
+                <div class="product-card" data-category="${product.category}">
+                    <div class="product-image">${product.icon}</div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <div class="product-price">${formatCurrency(product.price)}</div>
+                        <p class="product-description">${product.description}</p>
+                        <div class="product-actions">
+                            <div class="quantity-control">
+                                <button class="qty-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+                                <input type="number" class="qty-input" id="qty-${product.id}" value="1" min="1" max="10">
+                                <button class="qty-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+                            </div>
+                            <button class="add-to-cart" onclick="addToCart(${product.id})">
+                                ➕ Thêm vào giỏ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Change quantity
+        function changeQuantity(productId, change) {
+            const input = document.getElementById(`qty-${productId}`);
+            const newValue = Math.max(1, Math.min(10, parseInt(input.value) + change));
+            input.value = newValue;
+        }
+
+        // Add to cart
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const quantity = parseInt(document.getElementById(`qty-${productId}`).value);
+            
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    ...product,
+                    quantity: quantity
+                });
+            }
+            
+            updateCartDisplay();
+            showNotification(`✅ Đã thêm ${product.name} vào giỏ hàng!`);
+            
+            // Reset quantity to 1
+            document.getElementById(`qty-${productId}`).value = 1;
+        }
+
+        // Remove from cart
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartDisplay();
+            showNotification(`🗑️ Đã xóa sản phẩm khỏi giỏ hàng!`);
+        }
+
+        // Update cart display
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotalHeader = document.getElementById('cart-total-header');
+            const cartTotalSection = document.getElementById('cart-total-section');
+            const totalAmount = document.getElementById('total-amount');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-cart">
+                        <div class="empty-cart-icon">🛒</div>
+                        <p>Giỏ hàng trống</p>
+                        <p style="font-size: 14px; margin-top: 5px;">Hãy chọn sản phẩm yêu thích!</p>
+                    </div>
+                `;
+                cartTotalSection.style.display = 'none';
+                checkoutBtn.disabled = true;
+                cartCount.textContent = '0';
+                cartTotalHeader.textContent = '0 VNĐ';
+            } else {
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">${formatCurrency(item.price)}</div>
+                        </div>
+                        <div class="cart-item-qty">x${item.quantity}</div>
+                        <button class="remove-item" onclick="removeFromCart(${item.id})">×</button>
+                    </div>
+                `).join('');
+
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+                cartTotalSection.style.display = 'block';
+                checkoutBtn.disabled = false;
+                totalAmount.textContent = formatCurrency(total);
+                cartCount.textContent = totalItems;
+                cartTotalHeader.textContent = formatCurrency(total);
+            }
+        }
+
+        // Filter by category
+        function filterCategory(category) {
+            currentCategory = category;
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderProducts();
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Checkout
+        function checkout() {
+            if (cart.length === 0) return;
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            if (confirm(`🛒 Xác nhận thanh toán\n\nSố lượng: ${itemCount} sản phẩm\nTổng tiền: ${formatCurrency(total)}\n\nBạn có muốn tiếp tục?`)) {
+                // Simulate checkout process
+                showNotification('🔄 Đang chuyển đến trang thanh toán...');
+                
+                setTimeout(() => {
+                    alert(`✅ Đặt hàng thành công!\n\nMã đơn hàng: #DH${Date.now().toString().slice(-6)}\nTổng tiền: ${formatCurrency(total)}\n\nCảm ơn bạn đã mua hàng!`);
+                    cart = [];
+                    updateCartDisplay();
+                }, 2000);
+            }
+        }
+
+        // Toggle cart (for mobile)
+        function toggleCart() {
+            // On mobile, scroll to cart section
+            if (window.innerWidth <= 768) {
+                document.querySelector('.cart-panel').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            updateCartDisplay();
+        });
+
+        // Auto-focus on quantity inputs
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('qty-input')) {
+                e.target.select();
+            }
+        });
+    </script>
+</body>
+</html>

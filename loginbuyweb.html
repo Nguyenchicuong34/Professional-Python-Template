@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title> synthetic Shopping  - by Chi Cuong</title>
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1: #ffecd2;
+      --bg2: #fcb69f;
+      --card-grad-a: linear-gradient(135deg,#f72585,#7209b7 60%);
+      --accent: #ff6b6b;
+      --muted: #69707a;
+      --glass: rgba(255,255,255,0.7);
+      --shadow: 0 6px 18px rgba(18,18,18,0.08);
+    }
+    *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    html,body{height:100%;margin:0;background:linear-gradient(135deg,var(--bg1),#e0c3fc 40%, #ffd6e0 100%);color:#0f172a;}
+    .container{max-width:1200px;margin:24px auto;padding:20px;}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px;border-radius:14px;background:rgba(255,255,255,0.55);backdrop-filter:blur(6px);box-shadow:var(--shadow);}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;background:linear-gradient(135deg,#ff416c,#ffb199);box-shadow:0 6px 18px rgba(0,0,0,0.12)}
+    .brand h1{margin:0;font-size:20px}
+    .brand p{margin:0;font-size:12px;color:var(--muted)}
+    .search{flex:1;margin:0 16px}
+    .search input{width:100%;padding:10px 14px;border-radius:999px;border:none;box-shadow:0 4px 10px rgba(0,0,0,0.06);outline:none}
+    .actions{display:flex;gap:8px;align-items:center}
+    .btn{padding:8px 14px;border-radius:999px;border:none;cursor:pointer;box-shadow:var(--shadow);font-weight:600}
+    .btn-primary{background:linear-gradient(90deg,#6a11cb,#ff6b6b);color:white}
+    .btn-ghost{background:transparent}
+    .credit{font-size:12px;color:var(--muted);text-align:right}
+
+    /* layout */
+    .main{display:grid;grid-template-columns:1fr 360px;gap:20px;margin-top:18px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+    .card{background:white;border-radius:14px;padding:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform .18s}
+    .card:hover{transform:translateY(-6px)}
+    .thumb{height:150px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:16px}
+    .price-row{display:flex;justify-content:space-between;align-items:center}
+    .tag{font-size:12px;padding:6px 8px;border-radius:999px;background:linear-gradient(90deg,#ffd89b,#19547b);color:#06202a;font-weight:700}
+
+    /* cart */
+    .cart{background:linear-gradient(180deg,#fff,#f7f7ff);padding:16px;border-radius:12px;box-shadow:var(--shadow);height:fit-content}
+    .cart h3{margin:0 0 8px 0}
+    .cart-list{max-height:420px;overflow:auto;display:flex;flex-direction:column;gap:10px}
+    .cart-item{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,0.6);padding:8px;border-radius:10px}
+    .cart-item img{width:56px;height:56px;border-radius:8px;object-fit:cover}
+    .qty{display:flex;align-items:center;gap:8px}
+    .qty button{width:28px;height:28px;border-radius:8px;border:none;background:#f1f5f9;cursor:pointer}
+
+    /* footer credit */
+    footer{margin-top:18px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.5);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:none;align-items:center;justify-content:center;padding:20px}
+    .modal{background:white;padding:18px;border-radius:12px;min-width:320px;max-width:480px;box-shadow:0 20px 50px rgba(2,6,23,0.6)}
+    .modal h2{margin:0 0 8px 0}
+    .close{background:transparent;border:none;font-weight:700;cursor:pointer;font-size:18px}
+
+    /* cart drawer for mobile */
+    .drawer{position:fixed;right:20px;bottom:20px;width:360px;max-width:calc(100% - 40px);box-shadow:0 18px 40px rgba(2,6,23,0.32);display:none}
+    .drawer.open{display:block}
+
+    /* responsive */
+    @media (max-width:980px){
+      .main{grid-template-columns:1fr;gap:12px}
+      .drawer{position:static;width:100%}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">CC</div>
+        <div>
+          <h1>Thu Ha Shopping</h1>
+          <p>Shop đa dạng  — trải nghiệm mua hàng uy tín </p>
+        </div>
+      </div>
+
+      <div class="search">
+        <input id="searchInput" placeholder="Tìm sản phẩm: áo, tai nghe, laptop..." />
+      </div>
+
+      <div class="actions">
+        <div class="small" id="greeting">Xin chào, quý khách</div>
+        <button class="btn btn-ghost" id="loginBtn">Đăng nhập</button>
+        <button class="btn btn-primary" id="openCartBtn">Giỏ hàng (<span id="cartCount">0</span>)</button>
+      </div>
+    </header>
+    <h1 style="text-align:center;margin:24px 0">Chào mừng đến với Thu Ha Shopping</h1>
+    <div class="main">
+      <!-- product list -->
+      <section>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <h2 style="margin:0">Sản phẩm nổi bật</h2>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn" id="filterAll">Tất cả</button>
+            <button class="btn" id="filterSale">Khuyến mãi</button>
+            <button class="btn" id="filterNew">Mới</button>
+          </div>
+        </div>
+
+        <div class="cards" id="productGrid">
+          <!-- cards rendered by JS -->
+        </div>
+      </section>
+
+      <!-- cart -->
+      <aside class="cart" aria-live="polite">
+        <h3>Giỏ hàng</h3>
+        <div class="cart-list" id="cartList">
+          <p class="small" id="emptyCart">Giỏ hàng trống</p>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+          <div>
+            <div class="small">Tổng</div>
+            <div style="font-weight:700;font-size:18px" id="totalAmount">0 ₫</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-primary" id="checkoutBtn">Thanh toán</button>
+            <button class="btn" id="clearCartBtn">Xóa giỏ</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      <div class="small">Design & UI: Colorful Market</div>
+      <div class="credit">by <strong>Chi Cuong</strong></div>
+    </footer>
+  </div>
+
+  <!-- Login modal -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <h2>Đăng nhập</h2>
+        <button class="close" id="closeModal">✕</button>
+      </div>
+
+      <p class="small">Đăng nhập nhanh (không lưu mật khẩu) để lưu giỏ hàng trên trình duyệt.</p>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+        <input id="username" placeholder="Tên của bạn" style="padding:10px;border-radius:8px;border:1px solid #e6e9ef"/>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn" id="guestBtn">Đăng nhập tạm</button>
+          <button class="btn btn-primary" id="doLogin">Đăng nhập</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart drawer for mobile -->
+  <div class="drawer" id="cartDrawer">
+    <div class="cart" style="margin:12px">
+      <h3>Giỏ hàng</h3>
+      <div class="cart-list" id="drawerCartList"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <div>
+          <div class="small">Tổng</div>
+          <div style="font-weight:700;font-size:16px" id="drawerTotal">0 ₫</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-primary" id="drawerCheckout">Thanh toán</button>
+          <button class="btn" id="drawerClose">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // --- SAMPLE PRODUCTS ---
+  const products = [
+    {id:1,name:'Laptop Pro 16"',price:25000000,tag:'Mới',desc:'Laptop cấu hình cao cho công việc & game',color1:'#ff6b6b',color2:'#f7d794',img:''},
+    {id:2,name:'Iphone 15 Pro Max',price:14900000,tag:'Hot',desc:'Màn hình sắc nét, camera đẹp',color1:'#845ef7',color2:'#5eead4',img:'https://www.google.com/aclk?sa=l&ai=DChsSEwjwlfnp8YGPAxWNFIMDHRMFNHEYACICCAEQAxoCc2Y&co=1&ase=2&gclid=CjwKCAjwhuHEBhBHEiwAZrvdchbhJlVnxwkovgpOUng3cip6S41OfdmdBRfPqKJBL7nK4d0uLZj4SRoC-hcQAvD_BwE&category=acrcp_v1_48&sig=AOD64_1vvjTrxre2ToY8dYxpbv6U6jvLfw&ctype=5&q=&nis=4&ved=2ahUKEwiihfbp8YGPAxVVcWwGHV4bDo4Qwg8oAXoECAUQEw&adurl='},
+    {id:3,name:'Tai nghe chống ồn',price:2200000,tag:'Khuyến mãi',desc:'Thoải mái nghe nhạc cả ngày',color1:'#ff9f1c',color2:'#ffbf69',img:''},
+    {id:4,name:'Áo thun màu sắc',price:299000,tag:'Mới',desc:'Vải cotton mềm mịn',color1:'#ff6b6b',color2:'#ffd6e0',img:''},
+    {id:5,name:'Balo du lịch',price:499000,tag:'Khuyến mãi',desc:'Chống nước, nhiều ngăn',color1:'#2b2d42',color2:'#8d99ae',img:''},
+    {id:6,name:'Loa bluetooth',price:890000,tag:'Hot',desc:'Âm thanh trung thực',color1:'#06d6a0',color2:'#118ab2',img:''}
+    // Thêm nhiều sản phẩm khác nếu cần
+    //{id:7,name:'Sách hay',price:150000,tag:'Mới',desc:'Những cuốn sách đáng đọc',color1:'#ef476f',color2:'#ffd166',img:''},
+    // {id:8,name:'Đồng hồ thông minh',price:3490000 ,tag:'Hot',desc:'Theo dõi sức khỏe, thể thao',color1:'#073b4c',color2:'#118ab2',img:''},
+    // {id:9,name:'Máy ảnh DSLR',price:15900000,tag:'Khuyến mãi',desc:'Chất lượng hình ảnh tuyệt vời',color1:'#ef476f',color2:'#ffd166',img:''},
+    // {id:10,name:'Bàn phím cơ',price:1200000,tag:'Mới',desc:'Cảm giác gõ tuyệt vời',color1:'#06d6a0',color2:'#118ab2',img:''},
+    // {id:11,name:'Chuột gaming',price:800000,tag:'Mới',desc:'Thiết kế công thái học, DPI cao',color1:'#ff9f1c',color2:'#ffbf69',img:''},
+    // {id:12,name:'Máy lọc không khí',price:349000 ,tag:'Khuyến mãi',desc:'Lọc bụi mịn, khử mùi',color1:'#2b2d42',color2:'#8d99ae',img:''}     
+  ];
+
+  // State (stored in localStorage so khi reload vẫn giữ) ---
+  const STORAGE_KEY = 'cc_shop_state_v1';
+  let state = {
+    user: null,
+    cart: [] // {id, qty}
+  };
+  // load
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if(saved) state = saved;
+  } catch(e){ /* ignore */ }
+
+  // helpers
+  const $ = id => document.getElementById(id);
+  const format = n => n.toLocaleString('vi-VN') + ' ₫';
+
+  // --- render products ---
+  function renderProducts(filter='all', query='') {
+    const grid = $('productGrid');
+    grid.innerHTML = '';
+    let list = products.slice();
+
+    if(filter === 'sale') list = list.filter(p => p.tag.toLowerCase().includes('khuyến') || p.tag.toLowerCase().includes('sale'));
+    if(filter === 'new') list = list.filter(p => p.tag.toLowerCase().includes('mới'));
+    if(query) list = list.filter(p => p.name.toLowerCase().includes(query.toLowerCase()));
+
+    list.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="thumb" style="background:linear-gradient(135deg, ${p.color1}, ${p.color2});">
+          ${p.name}
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="max-width:65%">
+            <div style="font-weight:700">${p.name}</div>
+            <div class="small" style="color:var(--muted);font-size:13px">${p.desc}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:800">${format(p.price)}</div>
+            <div class="tag" style="margin-top:6px">${p.tag}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn" data-id="${p.id}" onclick="viewDetail(${p.id})">Xem</button>
+          <button class="btn btn-primary" onclick="addToCart(${p.id})">Thêm vào giỏ</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  // --- cart logic ---
+  function saveState(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    updateUI();
+  }
+
+  function addToCart(id){
+    const existing = state.cart.find(c => c.id === id);
+    if(existing) existing.qty += 1;
+    else state.cart.push({id, qty:1});
+    saveState();
+    alert('Đã thêm vào giỏ');
+  }
+
+  function removeFromCart(id){
+    state.cart = state.cart.filter(c => c.id !== id);
+    saveState();
+  }
+
+  function changeQty(id, qty){
+    if(qty <= 0) return removeFromCart(id);
+    const c = state.cart.find(x => x.id === id);
+    if(c) c.qty = qty;
+    saveState();
+  }
+
+  function cartDetails(){
+    return state.cart.map(c => {
+      const p = products.find(x => x.id === c.id);
+      return {...p, qty: c.qty};
+    });
+  }
+
+  function totalAmount(){
+    return cartDetails().reduce((s,i)=> s + i.price * i.qty,0);
+  }
+
+  // --- UI updates ---
+  function updateUI(){
+    // greeting
+    $('greeting').textContent = state.user ? `Xin chào, ${state.user}` : 'Xin chào, Khách';
+
+    // cart count
+    const count = state.cart.reduce((s,i)=> s + i.qty,0);
+    $('cartCount').textContent = count;
+
+    // cart sidebar
+    const list = $('cartList');
+    const drawerList = $('drawerCartList');
+    list.innerHTML = '';
+    drawerList && (drawerList.innerHTML = '');
+    const details = cartDetails();
+    if(details.length === 0){
+      $('emptyCart').style.display = 'block';
+    } else {
+      $('emptyCart').style.display = 'none';
+      details.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'cart-item';
+        el.innerHTML = `
+          <div style="width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg, ${item.color1}, ${item.color2});display:flex;align-items:center;justify-content:center;color:white;font-weight:700">${item.name.split(' ')[0]}</div>
+          <div style="flex:1">
+            <div style="font-weight:700">${item.name}</div>
+            <div class="small" style="color:var(--muted)">${format(item.price)}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <div class="qty">
+              <button onclick="changeQty(${item.id}, ${item.qty - 1})">−</button>
+              <div style="min-width:28px;text-align:center">${item.qty}</div>
+              <button onclick="changeQty(${item.id}, ${item.qty + 1})">+</button>
+            </div>
+            <button style="background:transparent;border:none;color:#ef4444;cursor:pointer" onclick="removeFromCart(${item.id})">Xóa</button>
+          </div>
+        `;
+        list.appendChild(el);
+
+        // drawer item
+        if(drawerList){
+          const d = el.cloneNode(true);
+          drawerList.appendChild(d);
+        }
+      });
+    }
+
+    // totals
+    $('totalAmount').textContent = format(totalAmount());
+    const drawerTotal = $('drawerTotal');
+    if(drawerTotal) drawerTotal.textContent = format(totalAmount());
+  }
+
+  // --- login modal ---
+  const modal = $('modalBackdrop');
+  $('loginBtn').addEventListener('click', ()=> { modal.style.display='flex'; $('username').focus(); });
+  $('closeModal').addEventListener('click', ()=> modal.style.display='none');
+  $('guestBtn').addEventListener('click', ()=> {
+    state.user = 'Khách vãng lai';
+    saveState();
+    modal.style.display='none';
+  });
+  $('doLogin').addEventListener('click', ()=> {
+    const u = $('username').value.trim();
+    if(!u){ alert('Nhập tên của bạn'); $('username').focus(); return; }
+    state.user = u;
+    saveState();
+    modal.style.display='none';
+  });
+
+  // checkout
+  $('checkoutBtn').addEventListener('click', ()=> doCheckout());
+  $('drawerCheckout') && $('drawerCheckout').addEventListener('click', ()=> doCheckout());
+
+  function doCheckout(){
+    if(state.cart.length === 0){ alert('Giỏ hàng trống'); return; }
+    const name = state.user || 'Khách';
+    const total = totalAmount();
+    // giả lập thanh toán
+    alert(`Cảm ơn ${name}!\nBạn đã thanh toán ${format(total)}.\nĐơn hàng sẽ được xử lý.`);
+    state.cart = [];
+    saveState();
+  }
+
+  // clear cart
+  $('clearCartBtn').addEventListener('click', ()=> {
+    if(confirm('Xóa toàn bộ giỏ hàng?')){ state.cart = []; saveState(); }
+  });
+
+  // cart drawer open/close
+  $('openCartBtn').addEventListener('click', ()=> {
+    const drawer = $('cartDrawer');
+    if(drawer.classList.contains('open')) drawer.classList.remove('open');
+    else drawer.classList.add('open');
+  });
+  $('drawerClose') && $('drawerClose').addEventListener('click', ()=> $('cartDrawer').classList.remove('open'));
+
+  // product filters
+  $('filterAll').addEventListener('click', ()=> renderProducts('all', $('searchInput').value));
+  $('filterSale').addEventListener('click', ()=> renderProducts('sale', $('searchInput').value));
+  $('filterNew').addEventListener('click', ()=> renderProducts('new', $('searchInput').value));
+
+  // search
+  $('searchInput').addEventListener('input', (e)=> renderProducts('all', e.target.value));
+
+  // view detail (simple modal)
+  function viewDetail(id){
+    const p = products.find(x=>x.id===id);
+    if(!p) return;
+    const message = `${p.name}\\n\\nGiá: ${format(p.price)}\\n\\n${p.desc}`;
+    if(confirm(message + "\\n\\nBạn muốn thêm vào giỏ?")) addToCart(id);
+  }
+
+  // expose viewDetail to window
+  window.viewDetail = viewDetail;
+  window.addToCart = addToCart;
+  window.changeQty = changeQty;
+  window.removeFromCart = removeFromCart;
+
+  // initial render
+  renderProducts();
+  updateUI();
+
+  // save every 5s to reduce risk of lost changes (optional)
+  setInterval(()=> localStorage.setItem(STORAGE_KEY, JSON.stringify(state)), 5000);
+</script>
+
+</body>
+</html>
